@@ -4,7 +4,7 @@ pipeline {
     PATH = "/usr/local/bin:/usr/bin:/bin:$PATH"
   }
   parameters {
-    string(name: 'TARGET_IP', defaultValue: 'target-host', description: 'Target IP/hostname')
+    string(name: 'TARGET_IP', defaultValue: '', description: 'Target IP/hostname')
     choice(name: 'CREDENTIALS', choices: ['ubuntu-dev-creds', 'mac-dev-creds'], description: 'Select SSH credentials')
     choice(name: 'SUDO_CREDENTIALS', choices: ['ubuntu-sudo-creds', 'mac-sudo-creds'], description: 'Select sudo password credentials')
     booleanParam(name: 'DO_CLEAN', defaultValue: false, description: 'Clean after update')
@@ -55,7 +55,7 @@ pipeline {
               env.REMOTE_OS = remoteOS
               echo "Remote OS detected: ${env.REMOTE_OS}"
 
-              def baseCmd = "CLEAN=${params.DO_CLEAN} ~/packages_update.sh"
+              def baseCmd = 'CLEAN=' + params.DO_CLEAN + ' ~/packages_update.sh'
               if (env.REMOTE_OS == 'Darwin') {
                 echo "Executing update on Darwin system without sudo"
                 sh "ssh -o StrictHostKeyChecking=no ${target} '${baseCmd}'"
@@ -64,8 +64,8 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: params.SUDO_CREDENTIALS,
                                                   usernameVariable: 'SUDO_USER',
                                                   passwordVariable: 'SUDO_PASS')]) {
-                  def remoteCmd = "echo '${SUDO_PASS}' | sudo -S ${baseCmd}"
-                  sh "ssh -o StrictHostKeyChecking=no ${target} '${remoteCmd}'"
+                  def remoteCmd = ' echo ' + SUDO_PASS + ' | sudo -S ' + baseCmd
+                  sh 'ssh -o StrictHostKeyChecking=no ' + target + ' \'' + remoteCmd + '\''
                 }
               }
             }
