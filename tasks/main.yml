@@ -1,0 +1,54 @@
+- name: Ensure we gather facts
+  ansible.builtin.setup:
+    gather_subset:
+      - 'distribution'
+
+- name: Ensure we have supported package manager
+  ansible.builtin.assert:
+    that:
+      - ansible_pkg_mgr in supported_pkg_mgr
+    fail_msg: "Unsupported package manager: {{ ansible_pkg_mgr }}. Supported: {{ supported_pkg_mgr | join(', ') }}"
+
+- name: Update packages using package manager
+  ansible.builtin.package:
+    name: "*"
+    state: latest
+  when: ansible_pkg_mgr in ["yum", "dnf", "apt"]
+
+- name: Update Homebrew repositories on Darwin
+  community.general.homebrew:
+    update_homebrew: yes
+    upgrade_all: yes
+  when: ansible_system == "Darwin"
+
+# - name: Upgrade all Homebrew packages on Darwin
+#   community.general.homebrew:
+#     upgrade_all: yes
+#   when: ansible_system == "Darwin"
+
+# ============================
+# Package Cleanup Tasks (Optional)
+# ============================
+
+# - name: Clean block
+#   when: do_clean | bool
+#   block:
+#     - name: Clean up APT cache
+#       ansible.builtin.command:
+#         cmd: apt-get clean
+#       when: ansible_pkg_mgr == "apt"
+
+#     - name: Clean up DNF cache
+#       ansible.builtin.command:
+#         cmd: dnf clean all
+#       when: ansible_pkg_mgr == "dnf"
+
+#     - name: Clean up YUM cache
+#       ansible.builtin.command:
+#         cmd: yum clean all
+#       when: ansible_pkg_mgr == "yum"
+
+#     - name: Clean up Homebrew cache
+#       community.general.homebrew:
+#         cleanup_all: yes
+#       when: ansible_system == "Darwin"
