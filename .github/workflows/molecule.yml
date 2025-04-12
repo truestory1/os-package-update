@@ -1,0 +1,28 @@
+name: Molecule
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  molecule:
+    runs-on: ubuntu-latest
+    # strategy:
+    #   fail-fast: false
+    #   matrix:
+    #     scenario:
+    #       - default
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "${{ github.repository }}"
+      - name: Molecule
+        uses: robertdebock/molecule-action@6.0.1
+        # with:
+        #   scenario: ${{ matrix.scenario }}
