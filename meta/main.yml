@@ -2,7 +2,7 @@
 galaxy_info:
   author: Author
   description: Description
-  role_name: awsrotateiamkey
+  role_name: ospackageupdate
   namespace: ns
   license: copyleft
   min_ansible_version: "2.10"
