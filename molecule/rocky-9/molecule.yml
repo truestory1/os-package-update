@@ -1,0 +1,22 @@
+---
+lint: |
+  set -e
+  yamllint .
+  ansible-lint -f full
+dependency:
+  name: galaxy
+driver:
+  name: containers
+platforms:
+  - name: os-package-update-01
+    image: rockylinux:9
+    pre_build_image: false
+    privileged: false
+  - name: os-package-update-02
+    image: ubuntu:22.04
+    pre_build_image: false
+    privileged: false
+provisioner:
+  name: ansible
+verifier:
+  name: ansible
